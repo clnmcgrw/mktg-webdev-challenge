@@ -22,6 +22,11 @@ export interface PersonRecord {
 	department?: DepartmentRecord
 }
 
+export interface PeoplePageProps {
+	allPeople: PersonRecord[]
+	allDepartments: DepartmentRecord[]
+}
+
 export type ButtonProps = Omit<
 	ComponentProps<'button'> & { open: boolean },
 	'type'
@@ -31,7 +36,12 @@ export type FilterProps = {
 	allDepartments: DepartmentRecord[]
 }
 
-export type DropdownProps = FilterProps & { deptId: string }
+export type DropdownProps = {
+	departments: DepartmentRecord[]
+	openIds: string[]
+	toggleMenu: (id: string) => void
+	allDepartments: DepartmentRecord[]
+}
 
 export type ResultsProps = {
 	people: PersonRecord[]

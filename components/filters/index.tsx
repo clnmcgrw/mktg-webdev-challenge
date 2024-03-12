@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import style from './style.module.css'
+import classNames from 'classnames'
 import {
 	DepartmentRecord,
 	ButtonProps,
@@ -23,8 +24,8 @@ const IconCaret = () => {
 	)
 }
 
-const ButtonCaret = (props: ButtonProps) => (
-	<button type="button" {...props}>
+const ButtonCaret = ({ open, ...rest }: ButtonProps) => (
+	<button type="button" {...rest}>
 		<IconCaret />
 	</button>
 )
@@ -35,38 +36,51 @@ const getSubMenuItems = (id: string, allDepartments: DepartmentRecord[]) =>
 
 // Favoring readability over dryness by not starting recursion at top-level (I think anyway)
 // otherwise would need conditional filter callback + top-level caret icon
-const FilterDropdowns = ({ deptId, allDepartments }: DropdownProps) => {
-	const [openId, setOpenId] = useState<string | null>(null)
-	const subMenuItems = getSubMenuItems(deptId, allDepartments)
-
-	return subMenuItems.length ? (
+const FilterDropdowns = ({
+	departments,
+	openIds,
+	toggleMenu,
+	allDepartments,
+}: DropdownProps) => {
+	return (
 		<ul>
-			{subMenuItems.map((item: DepartmentRecord) => {
-				const hasSubItems = getSubMenuItems(item.id, allDepartments).length
-				const isOpen = openId === item.id
+			{departments.map((item: DepartmentRecord) => {
+				const subItems = getSubMenuItems(item.id, allDepartments)
+				const hasSubItems = Boolean(subItems.length)
+				const isOpen = openIds.includes(item.id)
 				return (
-					<li key={item.id} className={isOpen ? 'is-open' : ''}>
-						{Boolean(hasSubItems) && (
-							<ButtonCaret
-								onClick={() => setOpenId(isOpen ? null : item.id)}
-								open={openId === item.id}
-							/>
+					<li key={item.id} className={classNames({ 'is-open': isOpen })}>
+						{hasSubItems && (
+							<ButtonCaret onClick={() => toggleMenu(item.id)} open={isOpen} />
 						)}
-						<button>{item.name}</button>
-						<FilterDropdowns deptId={item.id} allDepartments={allDepartments} />
+						<button className={style.filterButton}>{item.name}</button>
+						<FilterDropdowns
+							departments={subItems}
+							openIds={openIds}
+							toggleMenu={toggleMenu}
+							allDepartments={allDepartments}
+						/>
 					</li>
 				)
 			})}
 		</ul>
-	) : null
+	)
 }
 
 const DepartmentFilters = ({ allDepartments }: FilterProps) => {
-	const [openId, setOpenId] = useState<string | null>(null)
+	const [openIds, setOpenIds] = useState<string[]>([])
 
 	const topLevelItems: DepartmentRecord[] = allDepartments.filter(
 		(department: DepartmentRecord) => !department.parent
 	)
+
+	const toggleMenu = (id: string) => {
+		setOpenIds(
+			openIds.includes(id)
+				? openIds.filter((openId: string) => openId !== id)
+				: [...openIds, id]
+		)
+	}
 
 	return (
 		<nav className={style.filterNav}>
@@ -74,21 +88,27 @@ const DepartmentFilters = ({ allDepartments }: FilterProps) => {
 			<ul className={style.filterMenu}>
 				{topLevelItems.map((department: DepartmentRecord, index: number) => {
 					const subItems = getSubMenuItems(department.id, allDepartments)
-					const isOpen = openId === department.id
-					const openMenu = () => {
-						setOpenId(openId === department.id ? null : department.id)
-					}
+					const hasSubItems = Boolean(subItems.length)
+					const isOpen = openIds.includes(department.id)
 					return (
-						<li key={department.id} className={isOpen ? 'is-open' : ''}>
-							{subItems.length ? (
-								<ButtonCaret onClick={openMenu} open={isOpen} />
+						<li
+							key={department.id}
+							className={classNames({ 'is-open': isOpen })}
+						>
+							{hasSubItems ? (
+								<ButtonCaret
+									onClick={() => toggleMenu(department.id)}
+									open={isOpen}
+								/>
 							) : (
 								<IconCaret />
 							)}
 							<button>{department.name}</button>
-							{Boolean(subItems.length) && (
+							{hasSubItems && (
 								<FilterDropdowns
-									deptId={department.id}
+									departments={subItems}
+									openIds={openIds}
+									toggleMenu={toggleMenu}
 									allDepartments={allDepartments}
 								/>
 							)}
