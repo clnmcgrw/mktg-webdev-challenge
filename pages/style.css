@@ -5,3 +5,36 @@
 @import '../layouts/base/components/nav/style.css';
 
 /* Global styles here */
+
+:root {
+	--searchbar-max-width: 582px;
+	--grid-max-width: 1312px; /* match g-grid-container */
+	--grid-gutter: 48px; /* left/right padding of g-grid-container */
+}
+
+figure {
+	margin: 0;
+}
+
+ul {
+	list-style: none;
+	padding: 0 0 0 1rem;
+	margin: 0;
+}
+
+/* screen reader text */
+.sr-only {
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+}
+
+/* selector that doesn't seem to work from a css module */
+li.is-open > ul {
+	height: auto;
+}

@@ -1,0 +1,55 @@
+.search {
+	padding: var(--wpl-spacing-12) 0;
+	max-width: var(--searchbar-max-width);
+	margin: 0 auto;
+
+& > h1 {
+	text-align: center;
+	margin: 0 0 0.2em; /* relative to its own size */
+}
+
+& > p {
+	text-align: center;
+}
+}
+
+.searchForm {
+	padding: var(--wpl-spacing-04) 0 0;
+}
+
+.searchInput {
+	position: relative;
+
+& svg {
+	color: #ccc;
+	position: absolute;
+	top: 50%;
+	left: var(--wpl-spacing-03);
+	margin-top: -10px; /* vertically centered against input */
+}
+
+& input[type='text'] {
+	padding-left: var(--wpl-spacing-08);
+	height: var(--wpl-spacing-08);
+	width: 100%;
+	border: 1px solid #cfd1d9;
+	font-size: 1.15rem;
+	border-radius: 80px;
+}
+}
+
+.checkbox {
+	text-align: center;
+	padding-top: var(--wpl-spacing-01);
+	color: ;
+
+& label {
+	&:hover {
+		cursor: pointer; /* opinions vary on if this is good, idk */
+	}
+}
+
+& input[type='checkbox'] {
+	margin-right: var(--wpl-spacing-01);
+}
+}

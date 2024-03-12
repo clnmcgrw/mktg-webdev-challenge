@@ -2,7 +2,7 @@ import React from 'react'
 import { AppProps } from 'next/app'
 import './style.css'
 
-const EmptyLayout = ({ children }) => children
+const EmptyLayout = ({ children }: { children: React.ReactElement }) => children
 
 interface HashiAppProps extends AppProps {
 	Component: AppProps['Component'] & { layout?: React.ComponentType }

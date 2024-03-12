@@ -1,0 +1,46 @@
+.grid {
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--wpl-spacing-03);
+}
+
+.gridItem {
+	border: 1px solid #ccc;
+	text-align: center;
+	padding: var(--wpl-spacing-02);
+
+& h4 {
+	margin: 0.5rem 0 0.25rem;
+}
+
+& p {
+	margin: 0 0 0.25rem;
+
+	&:last-of-type {
+		margin-bottom: 0;
+	}
+}
+}
+
+.avatar {
+	width: 106px;
+	height: 110px;
+	margin: 0 auto;
+	border-radius: 50%;
+	overflow: hidden;
+
+& img {
+	display: block;
+	width: 108%;
+	margin-left: -4%;
+	height: auto;
+}
+}
+
+@media (--large) {
+	.grid {
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--wpl-spacing-06);
+	}
+}

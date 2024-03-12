@@ -1,0 +1,17 @@
+.filterNav h5 {
+	margin-top: 0;
+}
+
+/* hides all submenus */
+.filterMenu ul {
+	height: 0;
+	overflow: hidden;
+}
+
+/* hmmm, there's things idk about css modules */
+
+/* .filterMenu {
+  > li.is-open > ul {
+    height: auto;
+  }
+} */
