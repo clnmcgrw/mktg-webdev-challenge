@@ -10,17 +10,17 @@
 	text-align: center;
 	padding: var(--wpl-spacing-02);
 
-& h4 {
-	margin: 0.5rem 0 0.25rem;
-}
-
-& p {
-	margin: 0 0 0.25rem;
-
-	&:last-of-type {
-		margin-bottom: 0;
+	& h4 {
+		margin: 0.5rem 0 0.25rem;
 	}
-}
+
+	& p {
+		margin: 0 0 0.25rem;
+
+		&:last-of-type {
+			margin-bottom: 0;
+		}
+	}
 }
 
 .avatar {
@@ -30,12 +30,19 @@
 	border-radius: 50%;
 	overflow: hidden;
 
-& img {
-	display: block;
-	width: 108%;
-	margin-left: -4%;
-	height: auto;
+	& img {
+		display: block;
+		width: 108%;
+		margin-left: -4%;
+		height: auto;
+	}
 }
+
+.noResults {
+	text-align: center;
+	max-width: var(
+		--searchbar-max-width
+	); /* centered with searchbar (at least on lg screen) */
 }
 
 @media (--large) {

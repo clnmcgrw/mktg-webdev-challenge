@@ -1,5 +1,3 @@
-import { ComponentProps } from 'react'
-
 export interface DepartmentRecord {
 	id: string
 	name?: string
@@ -28,7 +26,7 @@ export interface PeoplePageProps {
 }
 
 export type ButtonProps = Omit<
-	ComponentProps<'button'> & { open: boolean },
+	React.ComponentProps<'button'> & { open: boolean },
 	'type'
 >
 
@@ -46,3 +44,28 @@ export type DropdownProps = {
 export type ResultsProps = {
 	people: PersonRecord[]
 }
+
+export interface SearchProviderProps extends PeoplePageProps {
+	children: React.ReactElement
+}
+
+export type SearchProviderValues = {
+	inputValue: string
+	searchCallback: () => void
+	departmentFilter: string | null
+	filterByDepartment: (id: string, active: boolean) => void
+	avatarsFilter: boolean
+	checkboxHandler: (e: React.ChangeEvent<HTMLInputElement>) => void
+	people: PersonRecord[]
+	allDepartments: DepartmentRecord[]
+	error: boolean
+}
+
+export type SearchParams = {
+	name?: string
+	department?: string
+	avatar?: string
+}
+
+// there's something better, union type for query params exists for a reason!
+type ApiRequest = Exclude<NextApiRequest, 'query'> & { query: SearchParams }

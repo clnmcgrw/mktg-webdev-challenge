@@ -1,3 +1,4 @@
+import { useSearchContext } from 'components/hooks'
 import style from './style.module.css'
 
 const IconSearch = () => (
@@ -18,6 +19,8 @@ const IconSearch = () => (
 )
 
 const SearchBar = () => {
+	const { inputValue, searchCallback, avatarsFilter, checkboxHandler } =
+		useSearchContext()
 	return (
 		<div className={style.search}>
 			<h1 className="g-type-display-1">HashiCorp Humans</h1>
@@ -31,12 +34,20 @@ const SearchBar = () => {
 						type="text"
 						id="search-input"
 						placeholder="Search people by name"
+						pattern="[a-zA-Z0-9\s]+"
+						value={inputValue}
+						onChange={searchCallback}
 					/>
 					<IconSearch />
 				</div>
 				<div className={style.checkbox}>
 					<label htmlFor="no-avatar-filter">
-						<input id="no-avatar-filter" type="checkbox" />
+						<input
+							id="no-avatar-filter"
+							type="checkbox"
+							checked={avatarsFilter}
+							onChange={checkboxHandler}
+						/>
 						<span className="g-type-body-small">
 							Hide people missing a profile image
 						</span>

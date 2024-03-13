@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import style from './style.module.css'
 import classNames from 'classnames'
+import { useSearchContext } from 'components/hooks'
 import {
 	DepartmentRecord,
 	ButtonProps,
@@ -30,6 +31,26 @@ const ButtonCaret = ({ open, ...rest }: ButtonProps) => (
 	</button>
 )
 
+const ButtonFilter = ({
+	department,
+	subDepartments,
+}: {
+	department: DepartmentRecord
+	subDepartments: DepartmentRecord[]
+}) => {
+	const { filterByDepartment, departmentFilter } = useSearchContext()
+	const active = departmentFilter.includes(department.id)
+	const handleClick = () => {
+		filterByDepartment(department.id, active)
+	}
+	const className = classNames(style.filterButton, { [style.active]: active })
+	return (
+		<button className={className} onClick={handleClick}>
+			{department.name}
+		</button>
+	)
+}
+
 // Helper Fn to get all sub-items by parent id
 const getSubMenuItems = (id: string, allDepartments: DepartmentRecord[]) =>
 	allDepartments.filter(({ parent }: DepartmentRecord) => parent?.id === id)
@@ -53,7 +74,7 @@ const FilterDropdowns = ({
 						{hasSubItems && (
 							<ButtonCaret onClick={() => toggleMenu(item.id)} open={isOpen} />
 						)}
-						<button className={style.filterButton}>{item.name}</button>
+						<ButtonFilter department={item} subDepartments={subItems} />
 						<FilterDropdowns
 							departments={subItems}
 							openIds={openIds}
@@ -67,7 +88,8 @@ const FilterDropdowns = ({
 	)
 }
 
-const DepartmentFilters = ({ allDepartments }: FilterProps) => {
+const DepartmentFilters = () => {
+	const { allDepartments } = useSearchContext()
 	const [openIds, setOpenIds] = useState<string[]>([])
 
 	const topLevelItems: DepartmentRecord[] = allDepartments.filter(
@@ -103,7 +125,7 @@ const DepartmentFilters = ({ allDepartments }: FilterProps) => {
 							) : (
 								<IconCaret />
 							)}
-							<button>{department.name}</button>
+							<ButtonFilter department={department} subDepartments={subItems} />
 							{hasSubItems && (
 								<FilterDropdowns
 									departments={subItems}

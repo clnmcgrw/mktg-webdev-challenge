@@ -1,5 +1,8 @@
-.filterNav h5 {
+.filterNav {
+	display: none;
+& h5 {
 	margin-top: 0;
+}
 }
 
 /* hides all submenus */
@@ -8,10 +11,25 @@
 	overflow: hidden;
 }
 
-/* hmmm, there's things idk about css modules */
+/* todo, bring this into module css */
 
 /* .filterMenu {
   > li.is-open > ul {
     height: auto;
   }
 } */
+
+.filterButton {
+	border: 0;
+	cursor: pointer;
+}
+
+.active {
+	font-weight: bold;
+}
+
+@media (--medium-up) {
+	.filterNav {
+		display: block;
+	}
+}
