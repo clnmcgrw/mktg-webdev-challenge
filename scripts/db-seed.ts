@@ -52,11 +52,11 @@ const sql = {
 	insert: `INSERT INTO people(id, name, title, avatar, department) VALUES(?, ?, ?, ?, ?)`,
 }
 
-// todo - better types
 type DatoData = {
 	allPeople: PersonRecord[]
 	type?: string
 }
+
 type DatoResponse = {
 	data: DatoData
 }

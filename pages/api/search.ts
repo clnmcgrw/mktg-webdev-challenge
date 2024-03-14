@@ -15,13 +15,9 @@ type SqlRow = {
 	department: string
 }
 
-type SqlQueries = {
-	all: string
-	search: (name: string, departments: string[], avatar: string) => string
-}
-
-const sql: SqlQueries = {
+const sql = {
 	all: `SELECT * FROM people`,
+	// yikes, this could be more readable eh
 	search: (name: string, departments: string[], avatar: string) => {
 		let stmt = `SELECT * FROM people WHERE name LIKE '%${name}%'`
 		if (avatar === 'true') {
@@ -30,13 +26,18 @@ const sql: SqlQueries = {
 		if (departments.length) {
 			stmt += ` AND`
 			departments.forEach((department: string, index: number) => {
+				if (index === 0) {
+					stmt += ` (`
+				}
 				stmt += ` department LIKE '%"id":"${department}"%'`
 				if (index < departments.length - 1) {
 					stmt += ` OR`
 				}
+				if (index + 1 === departments.length) {
+					stmt += ` )`
+				}
 			})
 		}
-		console.log(stmt)
 		return stmt
 	},
 }
@@ -51,11 +52,10 @@ export default async function handler(
 	const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY)
 
 	const { name, department, avatar } = req.query
+
 	const departments = department
 		.split(',')
 		.filter((dept: string) => dept.length)
-
-	console.log('searching... ', { name, departments, avatar })
 
 	const queryRows = () => {
 		let data: PersonRecord[] = []

@@ -1,17 +1,18 @@
 import { useState } from 'react'
 import style from './style.module.css'
 import classNames from 'classnames'
-import { useSearchContext } from 'components/hooks'
+import { useSearchContext, useKeyPress } from 'components/hooks'
+import { getChildDepartments } from 'components/search-provider'
 import {
 	DepartmentRecord,
-	ButtonProps,
+	ButtonCaretProps,
 	DropdownProps,
-	FilterProps,
+	ButtonFilterProps,
 } from 'types'
 
-const IconCaret = () => {
+const IconCaret = ({ className = '' }: { className?: string }) => {
 	return (
-		<span>
+		<span className={className}>
 			<svg
 				width="5"
 				height="8"
@@ -25,19 +26,13 @@ const IconCaret = () => {
 	)
 }
 
-const ButtonCaret = ({ open, ...rest }: ButtonProps) => (
-	<button type="button" {...rest}>
+const ButtonCaret = ({ open, ...rest }: ButtonCaretProps) => (
+	<button type="button" className={style.buttonCaret} {...rest}>
 		<IconCaret />
 	</button>
 )
 
-const ButtonFilter = ({
-	department,
-	subDepartments,
-}: {
-	department: DepartmentRecord
-	subDepartments: DepartmentRecord[]
-}) => {
+const ButtonFilter = ({ department, ...rest }: ButtonFilterProps) => {
 	const { filterByDepartment, departmentFilter } = useSearchContext()
 	const active = departmentFilter.includes(department.id)
 	const handleClick = () => {
@@ -45,42 +40,62 @@ const ButtonFilter = ({
 	}
 	const className = classNames(style.filterButton, { [style.active]: active })
 	return (
-		<button className={className} onClick={handleClick}>
+		<button type="button" className={className} onClick={handleClick} {...rest}>
 			{department.name}
 		</button>
 	)
 }
 
-// Helper Fn to get all sub-items by parent id
-const getSubMenuItems = (id: string, allDepartments: DepartmentRecord[]) =>
-	allDepartments.filter(({ parent }: DepartmentRecord) => parent?.id === id)
+// Helper Fn to get info needed for dropdown by dept id
+const getDropdownDetails = (
+	id: string,
+	openIds: string[],
+	allDepartments: DepartmentRecord[]
+) => {
+	const subItems = getChildDepartments(id, allDepartments)
+	const hasSubItems = Boolean(subItems.length)
+	const isOpen = openIds.includes(id)
+	const dropdownId = `dropdown-${id}`
+	return { subItems, hasSubItems, isOpen, dropdownId }
+}
 
 // Favoring readability over dryness by not starting recursion at top-level (I think anyway)
 // otherwise would need conditional filter callback + top-level caret icon
 const FilterDropdowns = ({
+	id = '',
 	departments,
 	openIds,
 	toggleMenu,
 	allDepartments,
+	setFocusedId,
 }: DropdownProps) => {
 	return (
-		<ul>
+		<ul id={id}>
 			{departments.map((item: DepartmentRecord) => {
-				const subItems = getSubMenuItems(item.id, allDepartments)
-				const hasSubItems = Boolean(subItems.length)
-				const isOpen = openIds.includes(item.id)
+				const { subItems, hasSubItems, isOpen, dropdownId } =
+					getDropdownDetails(item.id, openIds, allDepartments)
 				return (
 					<li key={item.id} className={classNames({ 'is-open': isOpen })}>
 						{hasSubItems && (
-							<ButtonCaret onClick={() => toggleMenu(item.id)} open={isOpen} />
+							<ButtonCaret
+								onClick={() => toggleMenu(item.id)}
+								onFocus={() => setFocusedId(item.id)}
+								open={isOpen}
+								aria-expanded={isOpen}
+								aria-controls={dropdownId}
+							/>
 						)}
-						<ButtonFilter department={item} subDepartments={subItems} />
-						<FilterDropdowns
-							departments={subItems}
-							openIds={openIds}
-							toggleMenu={toggleMenu}
-							allDepartments={allDepartments}
-						/>
+						<ButtonFilter department={item} />
+						{hasSubItems && (
+							<FilterDropdowns
+								id={dropdownId}
+								departments={subItems}
+								openIds={openIds}
+								toggleMenu={toggleMenu}
+								allDepartments={allDepartments}
+								setFocusedId={setFocusedId}
+							/>
+						)}
 					</li>
 				)
 			})}
@@ -96,6 +111,15 @@ const DepartmentFilters = () => {
 		(department: DepartmentRecord) => !department.parent
 	)
 
+	// closes any open dropdown w/ esc key when focused on dropdown button
+	const [focusedId, setFocusedId] = useState<string | null>(null)
+	useKeyPress('Escape', () => {
+		if (openIds.includes(focusedId)) {
+			setOpenIds(openIds.filter((openId: string) => openId !== focusedId))
+		}
+	})
+
+	// dropdown button click handler
 	const toggleMenu = (id: string) => {
 		setOpenIds(
 			openIds.includes(id)
@@ -105,33 +129,39 @@ const DepartmentFilters = () => {
 	}
 
 	return (
-		<nav className={style.filterNav}>
-			<h5 className="g-type-display-6">Filter By Department</h5>
+		<nav className={style.filterNav} aria-label="HashiCorp Departments">
+			<h5>Filter By Department</h5>
 			<ul className={style.filterMenu}>
 				{topLevelItems.map((department: DepartmentRecord, index: number) => {
-					const subItems = getSubMenuItems(department.id, allDepartments)
-					const hasSubItems = Boolean(subItems.length)
-					const isOpen = openIds.includes(department.id)
+					const { subItems, hasSubItems, isOpen, dropdownId } =
+						getDropdownDetails(department.id, openIds, allDepartments)
 					return (
 						<li
 							key={department.id}
-							className={classNames({ 'is-open': isOpen })}
+							className={classNames(style.filterListitem, {
+								'is-open': isOpen,
+							})}
 						>
 							{hasSubItems ? (
 								<ButtonCaret
 									onClick={() => toggleMenu(department.id)}
+									onFocus={() => setFocusedId(department.id)}
 									open={isOpen}
+									aria-expanded={isOpen}
+									aria-controls={dropdownId}
 								/>
 							) : (
-								<IconCaret />
+								<IconCaret className={style.iconCaret} />
 							)}
-							<ButtonFilter department={department} subDepartments={subItems} />
+							<ButtonFilter department={department} />
 							{hasSubItems && (
 								<FilterDropdowns
+									id={dropdownId}
 									departments={subItems}
 									openIds={openIds}
 									toggleMenu={toggleMenu}
 									allDepartments={allDepartments}
+									setFocusedId={setFocusedId}
 								/>
 							)}
 						</li>

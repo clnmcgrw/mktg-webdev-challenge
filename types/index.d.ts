@@ -1,3 +1,6 @@
+import { NextApiRequest } from 'next'
+import { NextRouter } from 'next/router'
+
 export interface DepartmentRecord {
 	id: string
 	name?: string
@@ -14,10 +17,10 @@ type Avatar = {
 
 export interface PersonRecord {
 	id: string
-	name?: string
-	title?: string
-	avatar?: Avatar
-	department?: DepartmentRecord
+	name: string
+	title: string
+	avatar: Avatar
+	department: DepartmentRecord
 }
 
 export interface PeoplePageProps {
@@ -25,24 +28,25 @@ export interface PeoplePageProps {
 	allDepartments: DepartmentRecord[]
 }
 
-export type ButtonProps = Omit<
-	React.ComponentProps<'button'> & { open: boolean },
-	'type'
+export type ButtonCaretProps = Omit<
+	React.ComponentProps<'button'> & {
+		open: boolean
+	},
+	'type' | 'className'
 >
 
-export type FilterProps = {
-	allDepartments: DepartmentRecord[]
-}
+export type ButtonFilterProps = Omit<
+	ButtonCaretProps & { department: DepartmentRecord },
+	'open' | 'focusedId' | 'setFocusedId'
+>
 
 export type DropdownProps = {
+	id: string
 	departments: DepartmentRecord[]
 	openIds: string[]
 	toggleMenu: (id: string) => void
 	allDepartments: DepartmentRecord[]
-}
-
-export type ResultsProps = {
-	people: PersonRecord[]
+	setFocusedId: Dispatch<SetStateAction<string>>
 }
 
 export interface SearchProviderProps extends PeoplePageProps {
@@ -51,8 +55,8 @@ export interface SearchProviderProps extends PeoplePageProps {
 
 export type SearchProviderValues = {
 	inputValue: string
-	searchCallback: () => void
-	departmentFilter: string | null
+	searchCallback: (e: React.ChangeEvent<HTMLInputElement>) => void
+	departmentFilter: string[]
 	filterByDepartment: (id: string, active: boolean) => void
 	avatarsFilter: boolean
 	checkboxHandler: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -67,5 +71,10 @@ export type SearchParams = {
 	avatar?: string
 }
 
-// there's something better, union type for query params exists for a reason!
-type ApiRequest = Exclude<NextApiRequest, 'query'> & { query: SearchParams }
+// there's something better, union type for Next query params exists for a reason!
+export type RouterWithQueryParams = Exclude<NextRouter, 'query'> & {
+	query: SearchParams
+}
+export type ApiRequest = Exclude<NextApiRequest, 'query'> & {
+	query: SearchParams
+}

@@ -23,8 +23,8 @@ const SearchBar = () => {
 		useSearchContext()
 	return (
 		<div className={style.search}>
-			<h1 className="g-type-display-1">HashiCorp Humans</h1>
-			<p className="g-type-body">Find a HashiCorp human</p>
+			<h1>HashiCorp Humans</h1>
+			<p>Find a HashiCorp human</p>
 			<form className={style.searchForm}>
 				<div className={style.searchInput}>
 					<label htmlFor="search-input" className="sr-only">
@@ -48,9 +48,7 @@ const SearchBar = () => {
 							checked={avatarsFilter}
 							onChange={checkboxHandler}
 						/>
-						<span className="g-type-body-small">
-							Hide people missing a profile image
-						</span>
+						<span>Hide people missing a profile image</span>
 					</label>
 				</div>
 			</form>

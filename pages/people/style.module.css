@@ -7,22 +7,30 @@
 .layout {
 	padding-bottom: var(--wpl-spacing-15);
 
-	@media (--medium-up) {
-		display: flex;
-	}
+@media (--medium-up) {
+		display: flex
+}
 }
 
 @media (--medium-up) {
+
 	.filters {
-		/* unusual, but ensures search bar is centered, while also aligning
-			 with left edge of grid items on large screens to match design  */
-		width: calc(
-			(var(--grid-max-width) - var(--searchbar-max-width)) * 0.5 -
-				var(--grid-gutter)
-		);
+		width: 280px;
+		padding-right: 1rem;
 	}
 
 	.results {
 		flex-grow: 2;
+	}
+}
+
+@media (--large) {
+	.filters {
+		/* unusual, but ensures search bar is centered, while also aligning
+			 with left edge of grid items on (at least on large screens)  */
+		width: calc(
+			(var(--grid-max-width) - var(--searchbar-max-width)) * 0.5 -
+				var(--grid-gutter)
+		);
 	}
 }

@@ -1,18 +1,46 @@
 import { useState, useRef, useEffect, createContext } from 'react'
-import { useRouter, NextRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import {
 	SearchProviderProps,
 	SearchProviderValues,
 	PersonRecord,
 	DepartmentRecord,
 	SearchParams,
+	RouterWithQueryParams,
 } from 'types'
 
-export const SearchContext = createContext<SearchProviderValues>(null)
+export const SearchContext = createContext<SearchProviderValues | null>(null)
 
-type RouterWithQueryParams = Exclude<NextRouter, 'query'> & {
-	query: SearchParams
+export const getChildDepartments = (
+	id: string,
+	allDepartments: DepartmentRecord[]
+) => allDepartments.filter(({ parent }: DepartmentRecord) => parent?.id === id)
+
+const getChildDepartmentIds = (
+	id: string,
+	allDepartments: DepartmentRecord[]
+) =>
+	getChildDepartments(id, allDepartments).map(({ id }: DepartmentRecord) => id)
+
+const getAllChildDepartments = (
+	id: string,
+	allDepartments: DepartmentRecord[]
+) => {
+	const childDepartments = []
+	const getAllChildren = (deptId: string) => {
+		const childIds = getChildDepartmentIds(deptId, allDepartments)
+		if (!childIds.length) {
+			return
+		}
+		childIds.forEach((childId: string) => {
+			childDepartments.push(childId)
+			getAllChildren(childId)
+		})
+	}
+	getAllChildren(id)
+	return childDepartments
 }
+
 const SearchProvider = ({
 	allPeople = [],
 	allDepartments = [],
@@ -32,7 +60,7 @@ const SearchProvider = ({
 		department: string[],
 		avatar: boolean
 	) => {
-		console.log('searching...')
+		console.log('searching...', { name, department, avatar })
 		const departmentValue = department.join(',')
 		const response = await fetch(
 			`/api/search?name=${name}&department=${departmentValue}&avatar=${avatar}`
@@ -42,6 +70,7 @@ const SearchProvider = ({
 		setPeople(json.data)
 	}
 
+	// search input handler
 	const searchCallback = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setInputValue(e.target.value)
 		if (timeoutRef.current) {
@@ -64,24 +93,16 @@ const SearchProvider = ({
 		}, 333)
 	}
 
+	// filter by dept id (allows multi-active if all in same top-level parent dept)
 	const filterByDepartment = async (departmentId: string, active: boolean) => {
-		// must fix - deep nested child depts not active
-		const getSubDepartments = (id: string) => {
-			const directChildren = allDepartments
-				.filter(({ parent }: DepartmentRecord) => parent?.id === id)
-				.map((child: DepartmentRecord) => child.id)
-			// if (directChildren.length) {
-			//   return getSubDepartments()
-			// }
-			return directChildren
-		}
-		const subDepartments = getSubDepartments(departmentId)
-		console.log('sub depts: ', subDepartments)
+		const subDepts = getAllChildDepartments(departmentId, allDepartments)
 
-		// TODO - fix this (rn clicking a child while parent is active clears everything)
-		const departmentIds: string[] = active
-			? []
-			: [...departmentFilter, ...subDepartments, departmentId]
+		let departmentIds = [...subDepts, departmentId]
+		if (active) {
+			departmentIds = departmentFilter.filter(
+				(id: string) => !departmentIds.includes(id)
+			)
+		}
 		setDepartmentFilter(departmentIds)
 
 		const searchTerm = inputValue.trim()
@@ -91,12 +112,13 @@ const SearchProvider = ({
 				...query,
 				department: departmentIds.join(','),
 			}
-			replace({ query: params }, '', { scroll: false })
+			replace({ query: params }, undefined, { scroll: false })
 		} catch (e: unknown) {
 			setError(true)
 		}
 	}
 
+	// avatar checkbox handler
 	const checkboxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAvatarsFilter(e.target.checked)
 		const params: SearchParams = {
@@ -106,25 +128,31 @@ const SearchProvider = ({
 		replace({ query: params }, '', { scroll: false })
 	}
 
+	// maybe better to not try to use router.query here
 	useEffect(() => {
-		if (query.name || query.department || query.avatar) {
-			const name = query.name ?? ''
-			const department = query?.department?.split(',') || []
-			const avatar = query.avatar === 'true'
-			setInputValue(name)
-			setDepartmentFilter(department)
-			setAvatarsFilter(avatar)
+		const params = new URLSearchParams(window.location.search)
+		if (
+			params.has('name') ||
+			params.has('department') ||
+			params.has('avatar')
+		) {
+			const name = params.get('name') ?? ''
+			const department = params.get('department')?.split(',') || []
+			const avatar = params.get('avatar') === 'true'
 			;(async () => {
 				try {
 					await searchPeople(name, department, avatar)
+					setInputValue(name)
+					setDepartmentFilter(department)
+					setAvatarsFilter(avatar)
 				} catch (e: unknown) {
 					setError(true)
 				}
 			})()
 		}
-	}, [query])
+	}, [])
 
-	const providerValue = {
+	const providerValue: SearchProviderValues = {
 		inputValue,
 		searchCallback,
 		departmentFilter,

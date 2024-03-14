@@ -15,7 +15,7 @@ export default function PeoplePage({
 }: PeoplePageProps) {
 	return (
 		<SearchProvider allPeople={allPeople} allDepartments={allDepartments}>
-			<main className="g-grid-container" role="main">
+			<main className="people-page g-grid-container" role="main">
 				<section className={style.search}>
 					<Search />
 				</section>

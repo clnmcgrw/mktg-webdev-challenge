@@ -1,31 +1,51 @@
 .filterNav {
 	display: none;
-& h5 {
-	margin-top: 0;
-}
+	& h5 {
+		font-size: var(--font-size-default);
+		margin-top: 0;
+	}
+
+	& ul {
+		list-style: none;
+		margin: 0;
+	}
 }
 
 /* hides all submenus */
-.filterMenu ul {
-	height: 0;
-	overflow: hidden;
+.filterMenu {
+	padding: 0;
+	& ul {
+		padding: 0 0 0 1rem;
+		visibility: hidden;
+		height: 0;
+		overflow: hidden;
+	}
 }
 
-/* todo, bring this into module css */
+.filterListitem {
+	display: block;
+}
 
-/* .filterMenu {
-  > li.is-open > ul {
-    height: auto;
-  }
-} */
-
-.filterButton {
+.filterButton,
+.buttonCaret {
 	border: 0;
 	cursor: pointer;
 }
 
-.active {
-	font-weight: bold;
+.filterButton.active {
+	font-weight: 600;
+}
+
+.iconCaret {
+	display: inline-block;
+	width: 1rem;
+	height: 1rem;
+}
+
+.buttonCaret {
+	padding: 0;
+	width: 1rem;
+	height: 1rem;
 }
 
 @media (--medium-up) {

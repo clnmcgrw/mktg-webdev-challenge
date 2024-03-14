@@ -10,12 +10,20 @@ const EmptyResults = ({ message }: { message: string }) => (
 )
 
 const ResultsGrid = () => {
-	const { people } = useSearchContext()
+	const { people, avatarsFilter } = useSearchContext()
+
+	// ugg, temp solution for something weird in SQlite Db
+	// one record w/ null avatar is still returned (despite `avatar != 'null'`)
+	// maybe something having to do w/ char encoding?
+	const tempPeople = avatarsFilter
+		? people.filter((person: PersonRecord) => person.avatar)
+		: people
+
 	return (
 		<div>
-			{people.length ? (
+			{tempPeople.length ? (
 				<ul className={style.grid}>
-					{people.map((person: PersonRecord, index: number) => (
+					{tempPeople.map((person: PersonRecord, index: number) => (
 						<li key={person.id} className={style.gridItem}>
 							<figure className={style.avatar}>
 								{!person.avatar ? (
@@ -36,9 +44,9 @@ const ResultsGrid = () => {
 									/>
 								)}
 							</figure>
-							<h4 className="g-type-body-strong">{person.name}</h4>
-							<p className="g-type-body-small">{person.title}</p>
-							<p className="g-type-body-small">{person.department.name}</p>
+							<h4>{person.name}</h4>
+							<p>{person.title}</p>
+							<p>{person.department.name}</p>
 						</li>
 					))}
 				</ul>
