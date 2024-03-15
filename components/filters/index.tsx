@@ -10,26 +10,8 @@ import {
 	ButtonFilterProps,
 } from 'types'
 
-const IconCaret = ({ className = '' }: { className?: string }) => {
-	return (
-		<span className={className}>
-			<svg
-				width="5"
-				height="8"
-				viewBox="0 0 5 8"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path d="M1 1L3.6875 3.9375L1 7" stroke="#989898" />
-			</svg>
-		</span>
-	)
-}
-
 const ButtonCaret = ({ open, ...rest }: ButtonCaretProps) => (
-	<button type="button" className={style.buttonCaret} {...rest}>
-		<IconCaret />
-	</button>
+	<button type="button" className={style.buttonCaret} {...rest} />
 )
 
 const ButtonFilter = ({ department, ...rest }: ButtonFilterProps) => {
@@ -64,7 +46,10 @@ const FilterDropdowns = ({
 				return (
 					<li
 						key={item.id}
-						className={classNames(style.filterListitem, { 'is-open': isOpen })}
+						className={classNames(style.listItem, {
+							[style.openItem]: isOpen,
+							[style.noCaret]: !hasSubItems,
+						})}
 					>
 						{hasSubItems && (
 							<ButtonCaret
@@ -128,8 +113,8 @@ const DepartmentFilters = () => {
 					return (
 						<li
 							key={department.id}
-							className={classNames(style.filterListitem, {
-								'is-open': isOpen,
+							className={classNames(style.listItem, {
+								[style.openItem]: isOpen,
 							})}
 						>
 							{hasSubItems ? (
@@ -141,7 +126,7 @@ const DepartmentFilters = () => {
 									aria-controls={dropdownId}
 								/>
 							) : (
-								<IconCaret className={style.iconCaret} />
+								<span className={style.iconCaret} />
 							)}
 							<ButtonFilter department={department} />
 							{hasSubItems && (

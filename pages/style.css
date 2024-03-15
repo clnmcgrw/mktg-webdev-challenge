@@ -59,8 +59,9 @@
 	}
 
 	/* todo - handle from filters css module */
-	li.is-open > ul {
+
+	/* li.is-open > ul {
 		visibility: visible;
 		height: auto;
-	}
+	} */
 }
