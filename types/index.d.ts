@@ -1,5 +1,4 @@
 import { NextApiRequest } from 'next'
-import { NextRouter } from 'next/router'
 
 export interface DepartmentRecord {
 	id: string
@@ -66,15 +65,17 @@ export type SearchProviderValues = {
 }
 
 export type SearchParams = {
-	name?: string
-	department?: string
-	avatar?: string
+	name: string
+	department: string[]
+	avatar: boolean
 }
 
-// there's something better, union type for Next query params exists for a reason!
-export type RouterWithQueryParams = Exclude<NextRouter, 'query'> & {
-	query: SearchParams
+// probably should have not excluded like this, and treated department param as array
+type SearchParamStrings = {
+	name: string
+	department: string
+	avatar: string
 }
 export type ApiRequest = Exclude<NextApiRequest, 'query'> & {
-	query: SearchParams
+	query: SearchParamStrings
 }

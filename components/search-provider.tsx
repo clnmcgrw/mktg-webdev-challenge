@@ -1,52 +1,21 @@
 import { useState, useRef, useEffect, createContext } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter, NextRouter } from 'next/router'
+import { getAllChildDepartments, searchPeople } from './utils'
 import {
 	SearchProviderProps,
 	SearchProviderValues,
 	PersonRecord,
-	DepartmentRecord,
 	SearchParams,
-	RouterWithQueryParams,
 } from 'types'
 
 export const SearchContext = createContext<SearchProviderValues | null>(null)
-
-export const getChildDepartments = (
-	id: string,
-	allDepartments: DepartmentRecord[]
-) => allDepartments.filter(({ parent }: DepartmentRecord) => parent?.id === id)
-
-const getChildDepartmentIds = (
-	id: string,
-	allDepartments: DepartmentRecord[]
-) =>
-	getChildDepartments(id, allDepartments).map(({ id }: DepartmentRecord) => id)
-
-const getAllChildDepartments = (
-	id: string,
-	allDepartments: DepartmentRecord[]
-) => {
-	const childDepartments = []
-	const getAllChildren = (deptId: string) => {
-		const childIds = getChildDepartmentIds(deptId, allDepartments)
-		if (!childIds.length) {
-			return
-		}
-		childIds.forEach((childId: string) => {
-			childDepartments.push(childId)
-			getAllChildren(childId)
-		})
-	}
-	getAllChildren(id)
-	return childDepartments
-}
 
 const SearchProvider = ({
 	allPeople = [],
 	allDepartments = [],
 	children,
 }: SearchProviderProps) => {
-	const { query, replace }: RouterWithQueryParams = useRouter()
+	const { replace }: NextRouter = useRouter()
 	const [inputValue, setInputValue] = useState('')
 	const [departmentFilter, setDepartmentFilter] = useState<string[]>([])
 	const [avatarsFilter, setAvatarsFilter] = useState(false)
@@ -55,19 +24,10 @@ const SearchProvider = ({
 
 	const timeoutRef = useRef(null)
 
-	const searchPeople = async (
-		name: string,
-		department: string[],
-		avatar: boolean
-	) => {
-		console.log('searching...', { name, department, avatar })
-		const departmentValue = department.join(',')
-		const response = await fetch(
-			`/api/search?name=${name}&department=${departmentValue}&avatar=${avatar}`
-		)
-		const json = await response.json()
-		console.log('search complete: ', `${json.data.length} results`)
-		setPeople(json.data)
+	// TODO - clean up so empty params aren't present in url
+	const updateSearchParams = ({ name, department, avatar }: SearchParams) => {
+		const query = { name, department: department.join(','), avatar }
+		replace({ query }, undefined, { scroll: false })
 	}
 
 	// search input handler
@@ -83,10 +43,15 @@ const SearchProvider = ({
 		}
 		// debounce, maybe an AbortController would be better than setting timeout
 		timeoutRef.current = setTimeout(async () => {
+			const searchValues = {
+				name: searchTerm,
+				department: departmentFilter,
+				avatar: avatarsFilter,
+			}
 			try {
-				await searchPeople(searchTerm, departmentFilter, avatarsFilter)
-				const params: SearchParams = { ...query, name: searchTerm }
-				replace({ query: params }, '', { scroll: false })
+				const results = await searchPeople(searchValues)
+				setPeople(results)
+				updateSearchParams(searchValues)
 			} catch (e: unknown) {
 				setError(true)
 			}
@@ -96,7 +61,6 @@ const SearchProvider = ({
 	// filter by dept id (allows multi-active if all in same top-level parent dept)
 	const filterByDepartment = async (departmentId: string, active: boolean) => {
 		const subDepts = getAllChildDepartments(departmentId, allDepartments)
-
 		let departmentIds = [...subDepts, departmentId]
 		if (active) {
 			departmentIds = departmentFilter.filter(
@@ -104,44 +68,50 @@ const SearchProvider = ({
 			)
 		}
 		setDepartmentFilter(departmentIds)
-
-		const searchTerm = inputValue.trim()
+		const searchValues = {
+			name: inputValue,
+			department: departmentIds,
+			avatar: avatarsFilter,
+		}
 		try {
-			await searchPeople(searchTerm, departmentIds, avatarsFilter)
-			const params: SearchParams = {
-				...query,
-				department: departmentIds.join(','),
-			}
-			replace({ query: params }, undefined, { scroll: false })
+			const results = await searchPeople(searchValues)
+			setPeople(results)
+			updateSearchParams(searchValues)
 		} catch (e: unknown) {
 			setError(true)
 		}
 	}
 
 	// avatar checkbox handler
-	const checkboxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const checkboxHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		setAvatarsFilter(e.target.checked)
-		const params: SearchParams = {
-			...query,
-			avatar: e.target.checked ? 'true' : 'false',
+		const searchValues = {
+			name: inputValue,
+			department: departmentFilter,
+			avatar: e.target.checked,
 		}
-		replace({ query: params }, '', { scroll: false })
+		try {
+			const results = await searchPeople(searchValues)
+			setPeople(results)
+			updateSearchParams(searchValues)
+		} catch (e: unknown) {
+			setError(true)
+		}
 	}
 
 	// maybe better to not try to use router.query here
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search)
-		if (
-			params.has('name') ||
-			params.has('department') ||
-			params.has('avatar')
-		) {
-			const name = params.get('name') ?? ''
-			const department = params.get('department')?.split(',') || []
-			const avatar = params.get('avatar') === 'true'
+		const name = params.get('name') ?? ''
+		const deptParam = params.get('department')
+		const department = deptParam ? deptParam.split(',') : []
+		const avatar = params.get('avatar') === 'true'
+
+		if (name || department.length || avatar) {
 			;(async () => {
 				try {
-					await searchPeople(name, department, avatar)
+					const results = await searchPeople({ name, department, avatar })
+					setPeople(results)
 					setInputValue(name)
 					setDepartmentFilter(department)
 					setAvatarsFilter(avatar)

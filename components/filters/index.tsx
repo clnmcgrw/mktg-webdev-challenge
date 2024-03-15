@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import style from './style.module.css'
 import classNames from 'classnames'
+import { getDropdownDetails } from 'components/utils'
 import { useSearchContext, useKeyPress } from 'components/hooks'
-import { getChildDepartments } from 'components/search-provider'
 import {
 	DepartmentRecord,
 	ButtonCaretProps,
@@ -46,19 +46,6 @@ const ButtonFilter = ({ department, ...rest }: ButtonFilterProps) => {
 	)
 }
 
-// Helper Fn to get info needed for dropdown by dept id
-const getDropdownDetails = (
-	id: string,
-	openIds: string[],
-	allDepartments: DepartmentRecord[]
-) => {
-	const subItems = getChildDepartments(id, allDepartments)
-	const hasSubItems = Boolean(subItems.length)
-	const isOpen = openIds.includes(id)
-	const dropdownId = `dropdown-${id}`
-	return { subItems, hasSubItems, isOpen, dropdownId }
-}
-
 // Favoring readability over dryness by not starting recursion at top-level (I think anyway)
 // otherwise would need conditional filter callback + top-level caret icon
 const FilterDropdowns = ({
@@ -75,7 +62,10 @@ const FilterDropdowns = ({
 				const { subItems, hasSubItems, isOpen, dropdownId } =
 					getDropdownDetails(item.id, openIds, allDepartments)
 				return (
-					<li key={item.id} className={classNames({ 'is-open': isOpen })}>
+					<li
+						key={item.id}
+						className={classNames(style.filterListitem, { 'is-open': isOpen })}
+					>
 						{hasSubItems && (
 							<ButtonCaret
 								onClick={() => toggleMenu(item.id)}
