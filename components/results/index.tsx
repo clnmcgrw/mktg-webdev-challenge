@@ -15,14 +15,14 @@ const ResultsGrid = () => {
 	return (
 		<div>
 			{people.length ? (
-				<ul className={style.grid}>
+				<ul id="people-results-list" className={style.grid}>
 					{people.map((person: PersonRecord, index: number) => (
 						<li key={person.id} className={style.gridItem}>
 							<figure className={style.avatar}>
 								{!person.avatar ? (
 									<Image
 										src="/avatar-fallback.png"
-										alt=""
+										alt={`Placeholder headshot for ${person.name}`}
 										width={213}
 										height={220}
 										priority={index <= 6}

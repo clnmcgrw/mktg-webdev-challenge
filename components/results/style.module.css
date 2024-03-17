@@ -3,12 +3,12 @@
 	margin: 0;
 	list-style: none;
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
+	grid-template-columns: repeat(1, 1fr);
 	gap: var(--wpl-spacing-03);
 
-	/* @media (min-width: 460px) {
+	@media (min-width: 520px) {
 		grid-template-columns: repeat(2, 1fr);
-	} */
+	}
 
 	@media (--large) {
 		grid-template-columns: repeat(3, 1fr);

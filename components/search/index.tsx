@@ -12,46 +12,59 @@ const IconSearch = () => (
 		strokeWidth="2"
 		strokeLinecap="round"
 		strokeLinejoin="round"
+		aria-hidden="true"
 	>
 		<circle cx="11" cy="11" r="8" />
 		<line x1="21" y1="21" x2="16.65" y2="16.65" />
 	</svg>
 )
 
+const searchInputPlaceholder = 'Search people by name'
+
 const SearchBar = () => {
 	const { inputValue, searchCallback, avatarsFilter, checkboxHandler } =
 		useSearchContext()
+
+	const preventSubmit = (e: React.SyntheticEvent) => {
+		e.preventDefault()
+	}
 	return (
 		<div className={style.search}>
 			<h1>HashiCorp Humans</h1>
 			<p>Find a HashiCorp human</p>
-			<form className={style.searchForm}>
-				<div className={style.searchInput}>
-					<label htmlFor="search-input" className="sr-only">
-						Search people by name
-					</label>
-					<input
-						type="text"
-						id="search-input"
-						placeholder="Search people by name"
-						pattern="[a-zA-Z0-9\s]+"
-						value={inputValue}
-						onChange={searchCallback}
-					/>
-					<IconSearch />
-				</div>
-				<div className={style.checkbox}>
-					<label htmlFor="no-avatar-filter">
+			<search>
+				<form
+					className={style.searchForm}
+					role="search"
+					onSubmit={preventSubmit}
+				>
+					<fieldset className={style.searchInput}>
+						<label htmlFor="search-input" className="sr-only">
+							{searchInputPlaceholder}
+						</label>
+						<input
+							type="search"
+							id="search-input"
+							placeholder={searchInputPlaceholder}
+							value={inputValue}
+							onChange={searchCallback}
+							aria-controls="people-results-list" /* the ul in results/index */
+						/>
+						<IconSearch />
+					</fieldset>
+					<fieldset className={style.checkbox}>
 						<input
 							id="no-avatar-filter"
 							type="checkbox"
 							checked={avatarsFilter}
 							onChange={checkboxHandler}
 						/>
-						<span>Hide people missing a profile image</span>
-					</label>
-				</div>
-			</form>
+						<label htmlFor="no-avatar-filter">
+							Hide people missing a profile image
+						</label>
+					</fieldset>
+				</form>
+			</search>
 		</div>
 	)
 }

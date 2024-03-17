@@ -15,15 +15,15 @@ export default function PeoplePage({
 }: PeoplePageProps) {
 	return (
 		<SearchProvider allPeople={allPeople} allDepartments={allDepartments}>
-			<main className="people-page g-grid-container" role="main">
-				<section className={style.search}>
+			<main className="people-page g-grid-container">
+				<section className={style.search} role="banner">
 					<Search />
 				</section>
-				<section className={style.layout}>
+				<section className={style.layout} role="complementary">
 					<div className={style.filters}>
 						<Filters />
 					</div>
-					<div className={style.results}>
+					<div className={style.results} role="region">
 						<Results />
 					</div>
 				</section>

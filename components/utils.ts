@@ -47,11 +47,43 @@ export const searchPeople = async ({
 export const getDropdownDetails = (
 	id: string,
 	openIds: string[],
+	departmentFilters: string[],
 	allDepartments: DepartmentRecord[]
 ) => {
 	const subItems = getChildDepartments(id, allDepartments)
 	const hasSubItems = Boolean(subItems.length)
 	const isOpen = openIds.includes(id)
 	const dropdownId = `dropdown-${id}`
-	return { subItems, hasSubItems, isOpen, dropdownId }
+	const isActive = departmentFilters.includes(id)
+	return { subItems, hasSubItems, isOpen, dropdownId, isActive }
+}
+
+const getAllParentDepartmentIds = (
+	id: string,
+	allDepartments: DepartmentRecord[]
+): string[] => {
+	const parentDepartments = []
+	const getAllParents = (deptId: string) => {
+		const match = allDepartments.find(
+			(dept: DepartmentRecord) => dept.id === deptId
+		)
+		if (match && match.parent) {
+			parentDepartments.push(match.parent.id)
+			getAllParents(match.parent.id)
+		}
+	}
+	getAllParents(id)
+	return parentDepartments
+}
+
+// get all parent ids for a group of active department ids
+export const getActiveDepartmentParents = (
+	departmentIds: string[],
+	allDepartments: DepartmentRecord[]
+) => {
+	const result = departmentIds.map((id: string) =>
+		getAllParentDepartmentIds(id, allDepartments)
+	)
+	const flattenedAndDeduped = new Set(result.flat())
+	return Array.from(flattenedAndDeduped)
 }

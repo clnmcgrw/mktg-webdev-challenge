@@ -27,6 +27,8 @@
 
 .searchInput {
 	position: relative;
+	padding: 0;
+	border: 0;
 
 	& svg {
 		color: #ccc;
@@ -36,19 +38,29 @@
 		margin-top: -10px; /* vertically centered against input */
 	}
 
-	& input[type='text'] {
+	& input[type='search'] {
+		outline: none;
 		padding-left: var(--wpl-spacing-08);
+		padding-right: var(--wpl-spacing-04);
 		height: var(--wpl-spacing-08);
 		width: 100%;
 		border: 1px solid #cfd1d9;
 		font-size: 1.15rem;
 		border-radius: 80px;
+		transition: border 0.2s ease, box-shadow 0.2s ease;
+
+		&:focus {
+			border-color: var(--page-color-primary);
+			box-shadow: var(--page-color-primary) 0 0 0 1px;
+		}
 	}
 }
 
 .checkbox {
 	text-align: center;
-	padding-top: var(--wpl-spacing-01);
+	padding: 0;
+	border: 0;
+	padding-top: var(--wpl-spacing-03);
 
 	& span {
 		font-size: var(--page-font-size-sm);

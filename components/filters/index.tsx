@@ -11,7 +11,7 @@ import {
 } from 'types'
 
 const ButtonCaret = ({ open, ...rest }: ButtonCaretProps) => (
-	<button type="button" className={style.buttonCaret} {...rest} />
+	<button className={style.buttonCaret} {...rest} />
 )
 
 const ButtonFilter = ({ department, ...rest }: ButtonFilterProps) => {
@@ -22,7 +22,7 @@ const ButtonFilter = ({ department, ...rest }: ButtonFilterProps) => {
 	}
 	const className = classNames(style.filterButton, { [style.active]: active })
 	return (
-		<button type="button" className={className} onClick={handleClick} {...rest}>
+		<button className={className} onClick={handleClick} {...rest}>
 			{department.name}
 		</button>
 	)
@@ -33,16 +33,24 @@ const ButtonFilter = ({ department, ...rest }: ButtonFilterProps) => {
 const FilterDropdowns = ({
 	id = '',
 	departments,
-	openIds,
-	toggleMenu,
-	allDepartments,
 	setFocusedId,
 }: DropdownProps) => {
+	const {
+		departmentFilter,
+		allDepartments,
+		openDropdownIds,
+		toggleDropdownById,
+	} = useSearchContext()
 	return (
 		<ul id={id}>
 			{departments.map((item: DepartmentRecord) => {
-				const { subItems, hasSubItems, isOpen, dropdownId } =
-					getDropdownDetails(item.id, openIds, allDepartments)
+				const { subItems, hasSubItems, isOpen, isActive, dropdownId } =
+					getDropdownDetails(
+						item.id,
+						openDropdownIds,
+						departmentFilter,
+						allDepartments
+					)
 				return (
 					<li
 						key={item.id}
@@ -53,21 +61,18 @@ const FilterDropdowns = ({
 					>
 						{hasSubItems && (
 							<ButtonCaret
-								onClick={() => toggleMenu(item.id)}
+								onClick={() => toggleDropdownById(item.id)}
 								onFocus={() => setFocusedId(item.id)}
 								open={isOpen}
 								aria-expanded={isOpen}
 								aria-controls={dropdownId}
 							/>
 						)}
-						<ButtonFilter department={item} />
+						<ButtonFilter department={item} aria-pressed={isActive} />
 						{hasSubItems && (
 							<FilterDropdowns
 								id={dropdownId}
 								departments={subItems}
-								openIds={openIds}
-								toggleMenu={toggleMenu}
-								allDepartments={allDepartments}
 								setFocusedId={setFocusedId}
 							/>
 						)}
@@ -79,8 +84,13 @@ const FilterDropdowns = ({
 }
 
 const DepartmentFilters = () => {
-	const { allDepartments } = useSearchContext()
-	const [openIds, setOpenIds] = useState<string[]>([])
+	const {
+		departmentFilter,
+		allDepartments,
+		openDropdownIds,
+		toggleDropdownById,
+	} = useSearchContext()
+	//const [openIds, setOpenIds] = useState<string[]>([])
 
 	const topLevelItems: DepartmentRecord[] = allDepartments.filter(
 		(department: DepartmentRecord) => !department.parent
@@ -89,27 +99,37 @@ const DepartmentFilters = () => {
 	// closes any open dropdown w/ esc key when focused on dropdown button
 	const [focusedId, setFocusedId] = useState<string | null>(null)
 	useKeyPress('Escape', () => {
-		if (openIds.includes(focusedId)) {
-			setOpenIds(openIds.filter((openId: string) => openId !== focusedId))
+		if (openDropdownIds.includes(focusedId)) {
+			toggleDropdownById(focusedId)
+			//setOpenIds(openIds.filter((openId: string) => openId !== focusedId))
 		}
 	})
 
 	// dropdown button click handler
-	const toggleMenu = (id: string) => {
-		setOpenIds(
-			openIds.includes(id)
-				? openIds.filter((openId: string) => openId !== id)
-				: [...openIds, id]
-		)
-	}
+	// const toggleMenu = (id: string) => {
+	// 	setOpenIds(
+	// 		openIds.includes(id)
+	// 			? openIds.filter((openId: string) => openId !== id)
+	// 			: [...openIds, id]
+	// 	)
+	// }
 
 	return (
-		<nav className={style.filterNav} aria-label="HashiCorp Departments">
-			<h5>Filter By Department</h5>
+		<nav
+			className={style.filterNav}
+			role="navigation"
+			aria-labelledby="filter-nav-title"
+		>
+			<h5 id="filter-nav-title">Filter By Department</h5>
 			<ul className={style.filterMenu}>
 				{topLevelItems.map((department: DepartmentRecord, index: number) => {
-					const { subItems, hasSubItems, isOpen, dropdownId } =
-						getDropdownDetails(department.id, openIds, allDepartments)
+					const { subItems, hasSubItems, isOpen, isActive, dropdownId } =
+						getDropdownDetails(
+							department.id,
+							openDropdownIds,
+							departmentFilter,
+							allDepartments
+						)
 					return (
 						<li
 							key={department.id}
@@ -119,7 +139,7 @@ const DepartmentFilters = () => {
 						>
 							{hasSubItems ? (
 								<ButtonCaret
-									onClick={() => toggleMenu(department.id)}
+									onClick={() => toggleDropdownById(department.id)}
 									onFocus={() => setFocusedId(department.id)}
 									open={isOpen}
 									aria-expanded={isOpen}
@@ -128,14 +148,11 @@ const DepartmentFilters = () => {
 							) : (
 								<span className={style.iconCaret} />
 							)}
-							<ButtonFilter department={department} />
+							<ButtonFilter department={department} aria-pressed={isActive} />
 							{hasSubItems && (
 								<FilterDropdowns
 									id={dropdownId}
 									departments={subItems}
-									openIds={openIds}
-									toggleMenu={toggleMenu}
-									allDepartments={allDepartments}
 									setFocusedId={setFocusedId}
 								/>
 							)}

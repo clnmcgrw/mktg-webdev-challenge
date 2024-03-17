@@ -14,6 +14,7 @@
 	--page-font-size-sm: 0.875rem;
 	--page-font-weight-bold: 600;
 	--page-font-color-light: #4e515d;
+	--page-color-primary: #1060ff;
 }
 
 /* everything inside header/footer */
@@ -57,11 +58,4 @@
 		padding: 0;
 		position: absolute;
 	}
-
-	/* todo - handle from filters css module */
-
-	/* li.is-open > ul {
-		visibility: visible;
-		height: auto;
-	} */
 }

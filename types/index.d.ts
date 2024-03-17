@@ -42,10 +42,7 @@ export type ButtonFilterProps = Omit<
 export type DropdownProps = {
 	id: string
 	departments: DepartmentRecord[]
-	openIds: string[]
-	toggleMenu: (id: string) => void
-	allDepartments: DepartmentRecord[]
-	setFocusedId: Dispatch<SetStateAction<string>>
+	setFocusedId: React.Dispatch<React.SetStateAction<string>>
 }
 
 export interface SearchProviderProps extends PeoplePageProps {
@@ -61,6 +58,8 @@ export type SearchProviderValues = {
 	checkboxHandler: (e: React.ChangeEvent<HTMLInputElement>) => void
 	people: PersonRecord[]
 	allDepartments: DepartmentRecord[]
+	openDropdownIds: string[]
+	toggleDropdownById: (id: string) => void
 	error: boolean
 }
 
@@ -72,9 +71,9 @@ export type SearchParams = {
 
 // probably should have not excluded like this, and treated department param as array
 type SearchParamStrings = {
-	name: string
-	department: string
-	avatar: string
+	name?: string
+	department?: string
+	avatar?: string
 }
 export type ApiRequest = Exclude<NextApiRequest, 'query'> & {
 	query: SearchParamStrings

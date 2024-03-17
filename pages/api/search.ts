@@ -19,7 +19,7 @@ const sql = {
 	all: `SELECT * FROM people`,
 	// yikes, this could be more readable eh
 	search: (name: string, departments: string[], avatar: string) => {
-		let stmt = `SELECT * FROM people WHERE name LIKE '%${name}%'`
+		let stmt = `SELECT * FROM people WHERE name LIKE ?`
 		if (avatar === 'true') {
 			stmt += ` AND avatar != 'null'`
 		}
@@ -66,6 +66,7 @@ export default async function handler(
 			) => {
 				db.all(
 					sql.search(name, departments, avatar),
+					[`%${name}%`], // use parameter for name so characters get escaped properly
 					(err: Error, rows: SqlRow[]) => {
 						if (err) {
 							reject(err)
