@@ -1,32 +1,40 @@
 import rivetQuery from '@hashicorp/platform-cms'
 import { GetStaticPropsResult } from 'next'
-import { PersonRecord, DepartmentRecord } from 'types'
-import BaseLayout from '../../layouts/base'
+import { PeoplePageProps } from 'types'
+import BaseLayout from 'layouts/base'
+import SearchProvider from 'components/search-provider'
+import Search from 'components/search'
+import Filters from 'components/filters'
+import Results from 'components/results'
 import style from './style.module.css'
 import query from './query.graphql'
-
-interface Props {
-	allPeople: PersonRecord[]
-	allDepartments: DepartmentRecord[]
-}
 
 export default function PeoplePage({
 	allPeople,
 	allDepartments,
-}: Props): React.ReactElement {
+}: PeoplePageProps) {
 	return (
-		<main className="g-grid-container">
-			<h2>People Data</h2>
-			<pre className={style.myData}>{JSON.stringify(allPeople, null, 2)}</pre>
-			<h2>Departments Data</h2>
-			<pre className={style.myData}>
-				{JSON.stringify(allDepartments, null, 2)}
-			</pre>
-		</main>
+		<SearchProvider allPeople={allPeople} allDepartments={allDepartments}>
+			<main className="people-page g-grid-container">
+				<section className={style.search} role="banner">
+					<Search />
+				</section>
+				<section className={style.layout} role="complementary">
+					<div className={style.filters}>
+						<Filters />
+					</div>
+					<div className={style.results} role="region">
+						<Results />
+					</div>
+				</section>
+			</main>
+		</SearchProvider>
 	)
 }
 
-export async function getStaticProps(): Promise<GetStaticPropsResult<Props>> {
+export async function getStaticProps(): Promise<
+	GetStaticPropsResult<PeoplePageProps>
+> {
 	const data = await rivetQuery({ query })
 	return { props: data }
 }

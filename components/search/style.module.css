@@ -1,0 +1,78 @@
+.search {
+	padding: var(--wpl-spacing-14) 0 var(--wpl-spacing-12);
+	max-width: var(--searchbar-max-width);
+	margin: 0 auto;
+
+	& > h1 {
+		font-size: 2.5rem;
+		text-align: center;
+		margin: 0 0 0.2em; /* relative to its own size */
+
+		@media (--medium-up) {
+			font-size: 3.25rem;
+		}
+		@media (--large) {
+			font-size: 4rem;
+		}
+	}
+
+	& > p {
+		text-align: center;
+	}
+}
+
+.searchForm {
+	padding: var(--wpl-spacing-04) 0 0;
+}
+
+.searchInput {
+	position: relative;
+	padding: 0;
+	border: 0;
+
+	& svg {
+		color: #ccc;
+		position: absolute;
+		top: 50%;
+		left: var(--wpl-spacing-03);
+		margin-top: -10px; /* vertically centered against input */
+	}
+
+	& input[type='search'] {
+		outline: none;
+		padding-left: var(--wpl-spacing-08);
+		padding-right: var(--wpl-spacing-04);
+		height: var(--wpl-spacing-08);
+		width: 100%;
+		border: 1px solid #cfd1d9;
+		font-size: 1.15rem;
+		border-radius: 80px;
+		transition: border 0.2s ease, box-shadow 0.2s ease;
+
+		&:focus {
+			border-color: var(--page-color-primary);
+			box-shadow: var(--page-color-primary) 0 0 0 1px;
+		}
+	}
+}
+
+.checkbox {
+	text-align: center;
+	padding: 0;
+	border: 0;
+	padding-top: var(--wpl-spacing-03);
+
+	& span {
+		font-size: var(--page-font-size-sm);
+	}
+
+	& label {
+		&:hover {
+			cursor: pointer; /* opinions vary on if this is good, idk */
+		}
+	}
+
+	& input[type='checkbox'] {
+		margin-right: var(--wpl-spacing-01);
+	}
+}

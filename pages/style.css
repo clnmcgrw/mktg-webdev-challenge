@@ -5,3 +5,57 @@
 @import '../layouts/base/components/nav/style.css';
 
 /* Global styles here */
+
+:root {
+	--searchbar-max-width: 582px;
+	--grid-max-width: 1312px; /* match g-grid-container */
+	--grid-gutter: 48px; /* left/right padding of g-grid-container */
+	--page-font-family: 'Open Sans', var(--font-display);
+	--page-font-size-sm: 0.875rem;
+	--page-font-weight-bold: 600;
+	--page-font-color-light: #4e515d;
+	--page-color-primary: #1060ff;
+}
+
+/* everything inside header/footer */
+.people-page {
+	font-family: var(--page-font-family);
+
+	input[type='text'],
+	button {
+		font-family: var(--page-font-family);
+	}
+
+	h1,
+	h2 {
+		line-height: 1.2;
+		font-weight: 300;
+	}
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-weight: var(--page-font-weight-bold);
+	}
+	p,
+	button,
+	span {
+		color: var(--page-font-color-light);
+	}
+	button {
+		border: 0;
+		font-size: 1rem;
+	}
+
+	/* screen reader text */
+	.sr-only {
+		clip: rect(1px, 1px, 1px, 1px);
+		clip-path: inset(50%);
+		height: 1px;
+		width: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute;
+	}
+}

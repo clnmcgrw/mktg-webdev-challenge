@@ -6,19 +6,26 @@
 # You may want / need to edit this query!
 
 query {
-	allDepartments(first: 100) {
+	allDepartments(first: 100, orderBy: name_ASC) {
+		id
 		name
 		parent {
 			id
 		}
 	}
 
-	allPeople(first: 100) {
+	allPeople(first: 100, orderBy: name_ASC) {
+		id
 		name
+		title
 		avatar {
 			url
+			alt
+			width
+			height
 		}
 		department {
+			id
 			name
 		}
 	}

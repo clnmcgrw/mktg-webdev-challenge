@@ -1,0 +1,93 @@
+.filterNav {
+	display: none;
+	& h5 {
+		font-size: var(--font-size-default);
+		margin-top: 0;
+	}
+
+	& ul {
+		list-style: none;
+		margin: 0;
+	}
+}
+
+/* hides all submenus */
+.filterMenu {
+	padding: 0;
+
+	& ul {
+		position: relative;
+		padding: 0.375rem 0 0 0.875rem;
+		display: none;
+
+		&::before {
+			content: '';
+			display: block;
+			position: absolute;
+			top: 0.75rem;
+			left: 1.4rem;
+			bottom: 0;
+			width: 1px;
+			height: auto;
+			background: #cbcbcb;
+		}
+	}
+}
+
+.listItem {
+	display: block;
+	margin-bottom: 0.375rem;
+}
+
+/* li with open submenu */
+.openItem {
+	& > ul {
+		display: block;
+	}
+
+	& > .buttonCaret {
+		transform: rotate(90deg);
+	}
+}
+
+/* li with no arrow icon */
+.noCaret {
+	padding-left: 1rem;
+}
+
+.filterButton,
+.buttonCaret {
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+
+.filterButton {
+	transition: color 0.2s ease;
+
+	&.active {
+		color: var(--page-color-primary);
+	}
+}
+
+.iconCaret,
+.buttonCaret {
+	position: relative;
+	top: 2px;
+	z-index: 9; /* above ul pseudo el */
+	display: inline-block;
+	padding: 0;
+	width: 1rem;
+	height: 1rem;
+	background: #fff url('/carat.svg') no-repeat center center;
+}
+
+.buttonCaret {
+	transition: transform 0.2s ease;
+}
+
+@media (--medium-up) {
+	.filterNav {
+		display: block;
+	}
+}
