@@ -19,8 +19,8 @@ export default function PeoplePage({
 				<section className={style.search} role="banner">
 					<Search />
 				</section>
-				<section className={style.layout} role="complementary">
-					<div className={style.filters}>
+				<section className={style.layout}>
+					<div className={style.filters} role="complementary">
 						<Filters />
 					</div>
 					<div className={style.results} role="region">

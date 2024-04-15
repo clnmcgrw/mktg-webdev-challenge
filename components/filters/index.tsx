@@ -90,7 +90,6 @@ const DepartmentFilters = () => {
 		openDropdownIds,
 		toggleDropdownById,
 	} = useSearchContext()
-	//const [openIds, setOpenIds] = useState<string[]>([])
 
 	const topLevelItems: DepartmentRecord[] = allDepartments.filter(
 		(department: DepartmentRecord) => !department.parent
@@ -101,18 +100,8 @@ const DepartmentFilters = () => {
 	useKeyPress('Escape', () => {
 		if (openDropdownIds.includes(focusedId)) {
 			toggleDropdownById(focusedId)
-			//setOpenIds(openIds.filter((openId: string) => openId !== focusedId))
 		}
 	})
-
-	// dropdown button click handler
-	// const toggleMenu = (id: string) => {
-	// 	setOpenIds(
-	// 		openIds.includes(id)
-	// 			? openIds.filter((openId: string) => openId !== id)
-	// 			: [...openIds, id]
-	// 	)
-	// }
 
 	return (
 		<nav
